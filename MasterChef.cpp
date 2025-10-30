@@ -14,7 +14,7 @@ using namespace std;
 
 StepList* recipeSteps;
 vector<int>* completedSteps;
-int completeCount = 0;
+volatile int completeCount = 0;
 
 void PrintHelp() // Given
 {
@@ -100,6 +100,11 @@ static void timerHandler( int sig, siginfo_t *si, void *uc )
 void RemoveDepHandler(int sig) {
 	/* TODO This Section - 3 */
 	// Foreach step that has been completed since last run, remove it as a dependency
+	for(auto step = completedSteps->begin(); step != completedSteps->end();++step){
+		recipeSteps->RemoveDependency(*step);
+	}
+	// The steps that have been completed should not need to be checked anymore they can be disposed of
+	completedSteps->clear();
 	/* End Section - 3 */
 }
 
