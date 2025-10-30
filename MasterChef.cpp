@@ -84,11 +84,13 @@ static void timerHandler( int sig, siginfo_t *si, void *uc )
 {
 	// Retrieve timer pointer from the si->si_value
     Step* comp_item = (Step*)si->si_value.sival_ptr;
-
 	/* TODO This Section - 2 */
 	// Officially complete the step using completedSteps and completeCount
-
+	comp_item->PrintComplete();
+	completedSteps->push_back(comp_item->id);
+	completeCount++;
 	// Ready to remove that dependency, call the trigger for the appropriate handler
+	kill(getpid(),SIGUSR1);
 	/* End Section - 2 */
 }
 
@@ -125,6 +127,9 @@ int main(int argc, char **argv)
 	/* TODO This Section - 1 */
 	// Associate the signal SIGRTMIN with the sa using the sigaction function
 	// Associate the appropriate handler with the SIGUSR1 signal, for removing dependencies
+	sigaction(SIGRTMIN, &sa, NULL);
+	signal(SIGUSR1, RemoveDepHandler);
+
 	
 	// Until all steps have been completed, check if steps are ready to be run and create a timer for them if so
 	/* End Section - 1 */
