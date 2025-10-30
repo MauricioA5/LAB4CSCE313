@@ -90,7 +90,7 @@ static void timerHandler( int sig, siginfo_t *si, void *uc )
 	completedSteps->push_back(comp_item->id);
 	completeCount++;
 	// Ready to remove that dependency, call the trigger for the appropriate handler
-	kill(getpid(),SIGUSR1);
+	raise(SIGUSR1);
 	/* End Section - 2 */
 }
 
@@ -137,6 +137,16 @@ int main(int argc, char **argv)
 
 	
 	// Until all steps have been completed, check if steps are ready to be run and create a timer for them if so
+	while(completeCount < recipeSteps->Count()){ // iterates continously while not everything is complete
+		// iterate through steps and launch them
+		for(Step* s: recipeSteps->GetReadySteps()){
+			if(!s->running){
+				s->running = true;
+				makeTimer(s, s->duration);
+			}
+		}
+		pause();
+	}
 	/* End Section - 1 */
 
 	cout << "Enjoy!" << endl;
